@@ -1,0 +1,22 @@
+---
+import { site } from '../data/site';
+import SectionHeading from './SectionHeading.astro';
+---
+
+<section id="about" class="scroll-mt-20 border-y border-line bg-ink-2">
+  <div class="mx-auto grid max-w-6xl items-center gap-12 px-5 py-24 sm:px-8 md:grid-cols-2">
+    <img
+      src={site.images.about}
+      alt={`${site.name} band photo`}
+      class="aspect-[4/5] w-full rounded-2xl object-cover"
+      loading="lazy"
+    />
+    <div>
+      <SectionHeading eyebrow="02 / About" title="Who we are" />
+      <div class="space-y-5 text-lg leading-relaxed text-bone/80">
+        {site.about.map((p) => <p>{p}</p>)}
+      </div>
+      <p class="mt-8 text-sm tracking-widest text-muted uppercase">Based in {site.location}</p>
+    </div>
+  </div>
+</section>

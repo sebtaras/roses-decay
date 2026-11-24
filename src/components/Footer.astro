@@ -1,0 +1,11 @@
+---
+import { site } from '../data/site';
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-line">
+  <div class="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-10 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-8">
+    <p>© {year} {site.name}. All rights reserved.</p>
+    <a href="#top" class="hover:text-bone">Back to top ↑</a>
+  </div>
+</footer>

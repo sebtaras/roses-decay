@@ -1,0 +1,35 @@
+---
+import { site } from '../data/site';
+import SectionHeading from './SectionHeading.astro';
+---
+
+<section id="links" class="mx-auto max-w-6xl scroll-mt-20 px-5 py-24 sm:px-8">
+  <SectionHeading eyebrow="03 / Links" title="Find us everywhere" />
+  <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    {site.links.map((link) => (
+      <li>
+        <a
+          href={link.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group flex items-center justify-between rounded-2xl border border-line bg-ink-2 px-6 py-5 transition hover:border-accent hover:bg-accent hover:text-ink"
+        >
+          <span>
+            <span class="block font-display text-2xl tracking-wide uppercase">{link.label}</span>
+            <span class="block text-sm text-muted transition group-hover:text-ink/70">{link.handle}</span>
+          </span>
+          <svg
+            class="h-6 w-6 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path d="M7 17 17 7M8 7h9v9" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>
