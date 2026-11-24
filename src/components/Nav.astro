@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import { site } from '../data/site';
 import { languages, type Lang, type Dictionary } from '../i18n';
+import Doodle from './deco/Doodle.astro';
 
 interface Props {
   lang: Lang;
@@ -9,80 +10,208 @@ interface Props {
 }
 const { lang, t } = Astro.props;
 
-// `show` = from which breakpoint the item appears (phones only get Contact to leave room for HR/EN + theme)
 const items = [
-  { href: '#listen', label: t.nav.listen, show: 'hidden sm:block' },
-  { href: '#about', label: t.nav.about, show: 'hidden md:block' },
-  { href: '#links', label: t.nav.links, show: 'hidden sm:block' },
-  { href: '#contact', label: t.nav.contact, show: '' },
+  { href: '#listen', label: t.nav.listen },
+  { href: '#about', label: t.nav.about },
+  { href: '#links', label: t.nav.links },
+  { href: '#contact', label: t.nav.contact },
 ];
+const langs = Object.entries(languages) as [Lang, (typeof languages)[Lang]][];
 ---
 
-<!-- Transparent with light text over the hero; turns into a paper strip with ink text once scrolled. -->
+<!--
+  Menu bar. Transparent over the hero, paper strip once scrolled.
+  The small logo only appears once scrolled, so it never shows next to the big hero logo.
+  Below md, section links + language move into a full-screen menu behind the hamburger.
+-->
 <header
-  class="fixed inset-x-0 top-0 z-50 text-bone transition-colors duration-300 data-[scrolled]:bg-paper/95 data-[scrolled]:text-ink data-[scrolled]:shadow-[0_2px_0_var(--color-ink)] data-[scrolled]:backdrop-blur"
+  class="group/nav fixed inset-x-0 top-0 z-50 text-bone transition-[color,background-color,box-shadow,transform] duration-300 will-change-transform data-[hidden]:-translate-y-full data-[hidden]:shadow-none data-[scrolled]:bg-paper data-[scrolled]:text-ink data-[scrolled]:shadow-[0_2px_0_var(--color-ink)]"
   data-nav
 >
-  <nav class="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-8">
-    <a href="#top" class="flex shrink-0 items-center gap-3" aria-label={t.nav.home}>
-      <Image src={site.logo} alt="" width={96} class="nav-logo-light h-10 w-auto sm:h-11" loading="eager" />
-      <Image src={site.logoDark} alt="" width={96} class="nav-logo-dark h-10 w-auto sm:h-11" loading="eager" />
+  <nav class="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2.5 sm:px-8 md:py-3">
+    <a
+      href="#top"
+      class="pointer-events-none flex shrink-0 -translate-y-1 items-center gap-3 opacity-0 transition duration-300 group-data-[scrolled]/nav:pointer-events-auto group-data-[scrolled]/nav:translate-y-0 group-data-[scrolled]/nav:opacity-100"
+      aria-label={t.nav.home}
+      tabindex="-1"
+      data-nav-home
+    >
+      <Image src={site.logo} alt="" width={96} class="nav-logo-light h-10 w-auto md:h-11" loading="eager" />
+      <Image src={site.logoDark} alt="" width={96} class="nav-logo-dark h-10 w-auto md:h-11" loading="eager" />
       <span class="hidden font-marker text-xl uppercase lg:inline">{site.name}</span>
     </a>
 
-    <div class="flex items-center gap-3 sm:gap-6">
-      <ul class="flex gap-3 font-marker text-sm uppercase sm:gap-6 sm:text-lg">
+    <div class="flex items-center gap-1 md:gap-6">
+      <!-- Desktop: section links -->
+      <ul class="hidden gap-6 font-marker text-lg uppercase md:flex">
         {items.map((i) => (
-          <li class={i.show}>
+          <li>
             <a href={i.href} class="hover-wiggle inline-block transition-colors hover:text-accent">{i.label}</a>
           </li>
         ))}
       </ul>
 
-      <div class="flex items-center gap-1 border-l-2 border-current/40 pl-3 sm:gap-2 sm:pl-5">
-        <!-- Language switcher -->
-        <ul class="flex font-marker text-sm sm:text-base" aria-label={t.nav.language}>
-          {Object.entries(languages).map(([code, l]) => (
-            <li>
-              {code === lang ? (
-                <span class="hl block px-1" aria-current="true" lang={code} title={l.name}>{l.label}</span>
-              ) : (
-                <a href={l.path} class="block px-1 opacity-70 hover:text-accent hover:opacity-100" lang={code} hreflang={code} title={l.name} data-lang-switch={code}>
-                  {l.label}
-                </a>
-              )}
-            </li>
-          ))}
-        </ul>
+      <!-- Desktop: language switcher -->
+      <ul class="hidden border-l-2 border-current/40 pl-5 font-marker md:flex" aria-label={t.nav.language}>
+        {langs.map(([code, l]) => (
+          <li>
+            {code === lang ? (
+              <span class="hl block px-1" aria-current="true" lang={code} title={l.name}>{l.label}</span>
+            ) : (
+              <a href={l.path} class="block px-1 opacity-70 hover:text-accent hover:opacity-100" lang={code} hreflang={code} title={l.name} data-lang-switch={code}>
+                {l.label}
+              </a>
+            )}
+          </li>
+        ))}
+      </ul>
 
-        <!-- Theme toggle -->
-        <button
-          type="button"
-          class="hover-wiggle ml-1 grid h-9 w-9 place-items-center rounded-full transition-colors hover:text-accent"
-          data-theme-toggle
-          data-label-dark={t.nav.themeToDark}
-          data-label-light={t.nav.themeToLight}
-          aria-label={t.nav.themeToDark}
-        >
-          <svg class="icon-moon h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" />
-          </svg>
-          <svg class="icon-sun h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="4.2" />
-            <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" />
-          </svg>
-        </button>
-      </div>
+      <button
+        type="button"
+        class="hover-wiggle grid h-11 w-11 place-items-center rounded-full transition-colors hover:text-accent"
+        data-theme-toggle
+        data-label-dark={t.nav.themeToDark}
+        data-label-light={t.nav.themeToLight}
+        aria-label={t.nav.themeToDark}
+      >
+        <svg class="icon-moon h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" />
+        </svg>
+        <svg class="icon-sun h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.2" />
+          <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" />
+        </svg>
+      </button>
+
+      <!-- Mobile: hamburger -->
+      <button
+        type="button"
+        class="grid h-11 w-11 place-items-center md:hidden"
+        aria-label={t.nav.openMenu}
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        data-menu-open
+      >
+        <svg class="h-8 w-8" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" style="filter: url(#rough)" aria-hidden="true">
+          <path d="M5 9 C 12 7.5, 20 10, 27 8.5" />
+          <path d="M6 16.5 C 13 15, 19 17.5, 26 16" />
+          <path d="M5 24 C 12 22.5, 21 25, 27 23.5" />
+        </svg>
+      </button>
     </div>
   </nav>
 </header>
 
+<!-- Mobile menu: a full notebook page with big marker links. Closed = invisible + inert. -->
+<div
+  id="mobile-menu"
+  class="notebook invisible fixed inset-0 z-[60] flex flex-col bg-paper text-ink opacity-0 transition-[opacity,visibility] duration-200 data-[open]:visible data-[open]:opacity-100 data-[open]:transition-opacity md:hidden"
+  role="dialog"
+  aria-modal="true"
+  aria-label={t.nav.menu}
+  inert
+  data-menu
+>
+  <div class="flex items-center justify-between px-4 py-2.5">
+    <a href="#top" class="flex items-center" aria-label={t.nav.home} data-menu-link>
+      <Image src={site.logoDark} alt="" width={96} class="menu-logo-dark h-10 w-auto" />
+      <Image src={site.logo} alt="" width={96} class="menu-logo-light h-10 w-auto" />
+    </a>
+    <div class="flex items-center gap-1">
+      <button
+        type="button"
+        class="grid h-11 w-11 place-items-center rounded-full transition-colors hover:text-accent"
+        data-theme-toggle
+        data-label-dark={t.nav.themeToDark}
+        data-label-light={t.nav.themeToLight}
+        aria-label={t.nav.themeToDark}
+      >
+        <svg class="icon-moon h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" />
+        </svg>
+        <svg class="icon-sun h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.2" />
+          <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" />
+        </svg>
+      </button>
+      <button type="button" class="grid h-11 w-11 place-items-center hover:text-accent" aria-label={t.nav.closeMenu} data-menu-close>
+        <Doodle name="x" class="h-8 w-8" />
+      </button>
+    </div>
+  </div>
+
+  <nav class="flex flex-1 flex-col justify-center px-8" aria-label={t.nav.menu}>
+    <ul class="space-y-3">
+      {items.map((i, n) => (
+        <li class={n % 2 ? 'rotate-1 pl-6' : '-rotate-1'}>
+          <a href={i.href} class="group inline-block py-1 font-marker text-5xl uppercase" data-menu-link>
+            <span class="hl-hover">{i.label}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+
+  <div class="flex flex-wrap items-end justify-between gap-4 px-8 pb-10">
+    <ul class="flex gap-2 font-marker text-2xl" aria-label={t.nav.language}>
+      {langs.map(([code, l]) => (
+        <li>
+          {code === lang ? (
+            <span class="hl block px-2" aria-current="true" lang={code} title={l.name}>{l.label}</span>
+          ) : (
+            <a href={l.path} class="block px-2 opacity-70 hover:text-accent hover:opacity-100" lang={code} hreflang={code} title={l.name} data-lang-switch={code}>
+              {l.label}
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
+    <a href={`mailto:${site.email}`} class="font-hand text-xl text-accent underline decoration-wavy underline-offset-4">
+      {site.email}
+    </a>
+  </div>
+</div>
+
 <script>
-  // Nav background once past the hero
+  const root = document.documentElement;
+
+  // Nav behaviour on scroll:
+  //  - over the hero: transparent, always visible
+  //  - past the hero: paper strip with the small logo; slides away while scrolling down and
+  //    comes back on any scroll up (stays put while it has keyboard focus)
   const nav = document.querySelector<HTMLElement>('[data-nav]');
-  const onScroll = () => nav?.toggleAttribute('data-scrolled', window.scrollY > window.innerHeight * 0.6);
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+  const home = document.querySelector<HTMLElement>('[data-nav-home]');
+  let lastY = window.scrollY;
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    const y = window.scrollY;
+    const scrolled = y > window.innerHeight * 0.6;
+    nav?.toggleAttribute('data-scrolled', scrolled);
+    home?.setAttribute('tabindex', scrolled ? '0' : '-1');
+
+    const delta = y - lastY;
+    if (!scrolled || nav?.contains(document.activeElement)) {
+      nav?.removeAttribute('data-hidden');
+    } else if (delta > 6) {
+      nav?.setAttribute('data-hidden', '');
+    } else if (delta < -6) {
+      nav?.removeAttribute('data-hidden');
+    }
+    if (Math.abs(delta) > 6) lastY = y;
+  };
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    },
+    { passive: true },
+  );
+  nav?.addEventListener('focusin', () => nav.removeAttribute('data-hidden'));
+  update();
 
   // Remember the language someone picks, so the home page doesn't auto-redirect them again
   document.querySelectorAll<HTMLAnchorElement>('[data-lang-switch]').forEach((a) => {
@@ -90,24 +219,53 @@ const items = [
       try {
         localStorage.setItem('lang', a.dataset.langSwitch!);
       } catch {}
-      a.href += location.hash; // stay on the same section
+      a.href = a.href.split('#')[0] + location.hash; // stay on the same section
     });
   });
 
-  // Theme toggle (initial theme is applied by an inline script in Layout.astro before paint)
-  const toggle = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
-  const syncLabel = () => {
-    const dark = document.documentElement.dataset.theme === 'dark';
-    toggle?.setAttribute('aria-label', (dark ? toggle.dataset.labelLight : toggle.dataset.labelDark) ?? '');
-    toggle?.setAttribute('aria-pressed', String(dark));
+  // Theme toggles (initial theme is applied by an inline script in Layout.astro before paint)
+  const toggles = document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]');
+  const syncLabels = () => {
+    const dark = root.dataset.theme === 'dark';
+    toggles.forEach((b) => {
+      b.setAttribute('aria-label', (dark ? b.dataset.labelLight : b.dataset.labelDark) ?? '');
+      b.setAttribute('aria-pressed', String(dark));
+    });
   };
-  toggle?.addEventListener('click', () => {
-    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-    document.documentElement.dataset.theme = next;
-    try {
-      localStorage.setItem('theme', next);
-    } catch {}
-    syncLabel();
+  toggles.forEach((b) =>
+    b.addEventListener('click', () => {
+      const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next;
+      try {
+        localStorage.setItem('theme', next);
+      } catch {}
+      syncLabels();
+    }),
+  );
+  syncLabels();
+
+  // Mobile menu
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+  const openBtn = document.querySelector<HTMLButtonElement>('[data-menu-open]');
+  const closeBtn = document.querySelector<HTMLButtonElement>('[data-menu-close]');
+  // Focus moves into the menu on open; it only returns to the hamburger when the menu was closed
+  // from the keyboard (on touch that would leave a focus outline around the button).
+  const setOpen = (open: boolean, viaKeyboard = false) => {
+    if (!menu || !openBtn) return;
+    menu.toggleAttribute('data-open', open);
+    menu.inert = !open;
+    openBtn.setAttribute('aria-expanded', String(open));
+    root.style.overflow = open ? 'hidden' : '';
+    if (open) closeBtn?.focus({ preventScroll: true });
+    else if (viaKeyboard) openBtn.focus({ preventScroll: true });
+    else (document.activeElement as HTMLElement | null)?.blur();
+  };
+  // MouseEvent.detail is 0 when a button is "clicked" with Enter/Space
+  openBtn?.addEventListener('click', () => setOpen(true));
+  closeBtn?.addEventListener('click', (e) => setOpen(false, e.detail === 0));
+  menu?.querySelectorAll('[data-menu-link]').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menu?.hasAttribute('data-open')) setOpen(false, true);
   });
-  syncLabel();
+  window.matchMedia('(min-width: 768px)').addEventListener('change', (e) => e.matches && setOpen(false));
 </script>

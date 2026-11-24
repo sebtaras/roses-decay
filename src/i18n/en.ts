@@ -12,6 +12,9 @@ const en = {
     language: 'Language',
     themeToDark: 'Switch to dark theme',
     themeToLight: 'Switch to light theme',
+    openMenu: 'Open menu',
+    closeMenu: 'Close menu',
+    menu: 'Menu',
   },
   hero: {
     tagline: 'Pop-punk & post-hardcore from Zagreb.',
@@ -36,8 +39,6 @@ const en = {
       'The band takes its roots from the music of the early 2000s, the genres that defined both the underground and the mainstream of that era. Blink-182, Sum 41, Funeral for a Friend, Finch, Amber Pacific, Adept, Underoath and many others left a big mark on their sound.',
       'The idea is to bring new life to the pop-punk scene with fresh songs in English, and to revive post-hardcore along the way. The band is currently recording its first EP.',
     ],
-    basedIn: 'Based in',
-    location: 'Zagreb, Croatia',
   },
   links: {
     eyebrow: 'Links',

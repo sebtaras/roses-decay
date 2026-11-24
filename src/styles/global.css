@@ -56,13 +56,18 @@ body {
 [data-theme="dark"] [data-nav][data-scrolled] .nav-logo-light { display: block; }
 [data-theme="dark"] [data-nav][data-scrolled] .nav-logo-dark { display: none; }
 
+/* Mobile menu logo: black on light paper, white on dark paper. */
+.menu-logo-light { display: none; }
+[data-theme="dark"] .menu-logo-light { display: block; }
+[data-theme="dark"] .menu-logo-dark { display: none; }
+
 /* Theme toggle icon: show the moon in light mode (go dark), the sun in dark mode. */
 [data-theme="dark"] .icon-moon,
 :root:not([data-theme="dark"]) .icon-sun { display: none; }
 
-/* Ruled notebook paper; the red margin line only shows on wider screens where there's room for it. */
+/* Ruled notebook paper; the red margin line only shows on wider screens where there's room for it.
+   (No positioning here: these custom classes are unlayered, so they'd override Tailwind's `fixed`/`absolute`.) */
 .notebook {
-  position: relative;
   background-image: repeating-linear-gradient(transparent 0 31px, color-mix(in srgb, var(--color-rule) 45%, transparent) 31px 32px);
 }
 @media (min-width: 768px) {

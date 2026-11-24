@@ -11,8 +11,8 @@ interface Props {
 const { t } = Astro.props;
 ---
 
-<section id="contact" class="notebook scroll-mt-16 pb-16">
-  <div class="mx-auto grid max-w-6xl gap-12 px-5 py-24 sm:px-8 md:grid-cols-[1fr_1.4fr] md:pl-24">
+<section id="contact" class="notebook relative scroll-mt-16 pb-16">
+  <div class="mx-auto grid max-w-6xl gap-12 px-5 py-16 sm:py-24 sm:px-8 md:grid-cols-[1fr_1.4fr] md:pl-24">
     <div class="relative min-w-0">
       <SectionHeading eyebrow={t.contact.eyebrow} title={t.contact.title} />
       <p class="text-lg leading-relaxed text-ink-soft">{t.contact.intro}</p>
@@ -24,6 +24,6 @@ const { t } = Astro.props;
       </a>
       <Doodle name="x" class="mt-10 hidden h-10 w-10 text-ink/60 md:block" />
     </div>
-    <ContactForm client:visible fallbackEmail={site.email} t={t.contact.form} />
+    <ContactForm client:visible accessKey={site.web3formsKey} fallbackEmail={site.email} t={t.contact.form} />
   </div>
 </section>

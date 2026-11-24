@@ -2,7 +2,7 @@
 import '../styles/global.css';
 import { getImage } from 'astro:assets';
 import { site } from '../data/site';
-import { languages, defaultLang, getDictionary, type Lang } from '../i18n';
+import { languages, defaultLang, getDictionary, withBase, type Lang } from '../i18n';
 
 interface Props {
   lang: Lang;
@@ -12,7 +12,8 @@ const { lang, title = site.name } = Astro.props;
 const t = getDictionary(lang);
 // Social share preview image (1200px JPEG).
 const ogImage = await getImage({ src: site.images.share, width: 1200, format: 'jpg' });
-const site_url = Astro.site;
+const absolute = (path: string) => (Astro.site ? new URL(path, Astro.site).href : path);
+const enPath = languages.en.path;
 ---
 
 <!doctype html>
@@ -24,12 +25,14 @@ const site_url = Astro.site;
     <meta name="color-scheme" content="light dark" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={t.meta.description} />
-    <meta property="og:image" content={site_url ? new URL(ogImage.src, site_url).href : ogImage.src} />
+    <meta property="og:image" content={absolute(ogImage.src)} />
+    <meta property="og:url" content={absolute(languages[lang].path)} />
     <meta property="og:locale" content={lang === 'hr' ? 'hr_HR' : 'en_US'} />
-    {Object.entries(languages).map(([code, l]) => <link rel="alternate" hreflang={code} href={l.path} />)}
-    <link rel="alternate" hreflang="x-default" href={languages[defaultLang].path} />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="canonical" href={absolute(languages[lang].path)} />
+    {Object.entries(languages).map(([code, l]) => <link rel="alternate" hreflang={code} href={absolute(l.path)} />)}
+    <link rel="alternate" hreflang="x-default" href={absolute(languages[defaultLang].path)} />
+    <link rel="icon" type="image/png" href={withBase('favicon.png')} />
+    <link rel="apple-touch-icon" href={withBase('apple-touch-icon.png')} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -53,17 +56,17 @@ const site_url = Astro.site;
     <!-- First visit to the Croatian home page from a non-Croatian-speaking browser → English.
          Once someone picks a language with the switcher, that choice always wins. -->
     {lang === defaultLang && (
-      <script is:inline>
+      <script is:inline define:vars={{ enPath }}>
         (function () {
           var saved;
           try { saved = localStorage.getItem('lang'); } catch (e) {}
           if (saved) {
-            if (saved === 'en') location.replace('/en/' + location.hash);
+            if (saved === 'en') location.replace(enPath + location.hash);
             return;
           }
           var langs = navigator.languages || [navigator.language || ''];
           var speaksLocal = langs.some(function (l) { return /^(hr|bs|sr|sh|cnr)\b/i.test(l); });
-          if (!speaksLocal) location.replace('/en/' + location.hash);
+          if (!speaksLocal) location.replace(enPath + location.hash);
         })();
       </script>
     )}

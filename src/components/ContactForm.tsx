@@ -4,9 +4,6 @@ import type { Dictionary } from '../i18n';
 type Status = 'idle' | 'sending' | 'sent' | 'error';
 type Strings = Dictionary['contact']['form'];
 
-// Same form name on every language page, so all messages land in one Netlify inbox.
-const FORM_NAME = 'contact';
-
 const field =
   'w-full border-0 border-b-2 border-ink bg-transparent px-1 py-2 font-hand text-2xl text-ink placeholder:text-ink/40 outline-none transition focus:border-accent focus:bg-hl/20';
 const label = 'block font-marker text-sm tracking-wide uppercase';
@@ -15,28 +12,45 @@ const sketch = (fill: string, color = fill) =>
   ({ '--sketch-fill': fill, '--sketch-color': color }) as CSSProperties;
 
 /**
- * Submits to Netlify Forms. Netlify detects the form from the static HTML at build time
- * (data-netlify + the hidden form-name input). Locally the POST has nowhere to go, so
- * you'll see the error state until the site is deployed on Netlify.
+ * Sends messages through Web3Forms (https://web3forms.com), which emails them to the address
+ * the access key was created for. Works on any static host, including GitHub Pages and localhost.
+ * The access key is meant to be public, so it lives in src/data/site.ts.
+ * Without a key, sending fails and the form shows the "email us instead" message.
  */
-export default function ContactForm({ fallbackEmail, t }: { fallbackEmail: string; t: Strings }) {
+export default function ContactForm({
+  accessKey,
+  fallbackEmail,
+  t,
+}: {
+  accessKey: string;
+  fallbackEmail: string;
+  t: Strings;
+}) {
   const [status, setStatus] = useState<Status>('idle');
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
+    const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
     setStatus('sending');
     try {
-      const body = new URLSearchParams(new FormData(form) as unknown as Record<string, string>);
-      const res = await fetch('/', {
+      if (!accessKey) throw new Error('No Web3Forms access key set in src/data/site.ts');
+      const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: body.toString(),
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          ...data,
+          access_key: accessKey,
+          subject: `Roses Decay website: ${data.topic}`,
+          from_name: 'Roses Decay website',
+        }),
       });
-      if (!res.ok) throw new Error(String(res.status));
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.success) throw new Error(json.message || String(res.status));
       form.reset();
       setStatus('sent');
-    } catch {
+    } catch (err) {
+      console.error('Contact form failed:', err);
       setStatus('error');
     }
   }
@@ -51,18 +65,11 @@ export default function ContactForm({ fallbackEmail, t }: { fallbackEmail: strin
   }
 
   return (
-    <form
-      name={FORM_NAME}
-      method="POST"
-      data-netlify="true"
-      netlify-honeypot="bot-field"
-      onSubmit={onSubmit}
-      className="space-y-6"
-    >
-      <input type="hidden" name="form-name" value={FORM_NAME} />
+    <form onSubmit={onSubmit} className="space-y-6">
+      {/* Spam trap: real people never see or tick this; Web3Forms drops submissions where it's checked */}
       <p hidden>
         <label>
-          {t.honeypot} <input name="bot-field" />
+          {t.honeypot} <input type="checkbox" name="botcheck" tabIndex={-1} autoComplete="off" />
         </label>
       </p>
 

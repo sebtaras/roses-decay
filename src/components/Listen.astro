@@ -11,9 +11,9 @@ interface Props {
 const { t } = Astro.props;
 ---
 
-<section id="listen" class="notebook scroll-mt-16">
+<section id="listen" class="notebook relative scroll-mt-16">
   <InkDrips seed={4} />
-  <div class="relative mx-auto max-w-6xl px-5 py-24 sm:px-8 md:pl-24">
+  <div class="relative mx-auto max-w-6xl px-5 py-16 sm:py-24 sm:px-8 md:pl-24">
     <Doodle name="star" class="absolute top-20 right-6 h-12 w-12 rotate-12 text-accent sm:right-16" />
     <SectionHeading eyebrow={t.listen.eyebrow} title={t.listen.title} />
 

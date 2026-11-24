@@ -14,7 +14,7 @@ const { t } = Astro.props;
 
 <section id="about" class="relative scroll-mt-16 bg-paper-2">
   <TornEdge position="above" fill="var(--color-paper-2)" seed={2} />
-  <div class="mx-auto grid max-w-6xl items-center gap-14 px-5 py-24 sm:px-8 md:grid-cols-2">
+  <div class="mx-auto grid max-w-6xl items-center gap-14 px-5 py-16 sm:py-24 sm:px-8 md:grid-cols-2">
     <!-- Taped-in polaroid -->
     <figure class="relative mx-auto w-full max-w-md rotate-2 bg-card p-3 pb-14 shadow-[4px_6px_0_rgb(0_0_0/0.85)]">
       <span class="tape -top-4 left-1/2 -translate-x-1/2 -rotate-3" aria-hidden="true"></span>
@@ -36,9 +36,6 @@ const { t } = Astro.props;
       <div class="space-y-5 text-lg leading-relaxed text-ink-soft">
         {t.about.paragraphs.map((p, i) => <p class={i === 0 ? 'text-xl text-ink' : ''}>{p}</p>)}
       </div>
-      <p class="mt-8 font-marker text-lg uppercase">
-        {t.about.basedIn} <span class="hl">{t.about.location}</span>
-      </p>
     </div>
   </div>
 </section>

@@ -14,6 +14,9 @@ const hr: Dictionary = {
     language: 'Jezik',
     themeToDark: 'Uključi tamnu temu',
     themeToLight: 'Uključi svijetlu temu',
+    openMenu: 'Otvori izbornik',
+    closeMenu: 'Zatvori izbornik',
+    menu: 'Izbornik',
   },
   hero: {
     tagline: 'Pop-punk i post-hardcore iz Zagreba.',
@@ -38,8 +41,6 @@ const hr: Dictionary = {
       'Bend vuče korijene iz glazbe ranih 2000-ih, žanrova koji su obilježili i underground i mainstream scenu tog vremena. Blink-182, Sum 41, Funeral for a Friend, Finch, Amber Pacific, Adept, Underoath i mnogi drugi ostavili su snažan trag na njihov zvuk.',
       'Ideja benda je osvježiti pop-punk scenu novim pjesmama na engleskom jeziku i ponovno oživjeti post-hardcore. Bend je trenutno u fazi snimanja prvog EP-a.',
     ],
-    basedIn: 'Dolazimo iz',
-    location: 'Zagreb, Hrvatska',
   },
   links: {
     eyebrow: 'Linkovi',

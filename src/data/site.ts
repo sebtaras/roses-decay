@@ -14,6 +14,10 @@ export const site = {
   name: 'Roses Decay',
   email: 'rosesdecayofficial@gmail.com',
 
+  // Contact form delivery via https://web3forms.com: enter the email above on their site, they email you
+  // an access key, paste it here. It's designed to be public (it can only send mail to that address).
+  web3formsKey: '', // TODO: paste access key
+
   // The logo files are trimmed copies of /assets/logo/*_nobg.png (see src/assets).
   logo: logoWhite, // for dark backgrounds
   logoDark: logoBlack, // for light paper backgrounds
