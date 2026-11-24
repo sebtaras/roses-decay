@@ -1,35 +1,60 @@
 ---
-import { site } from '../data/site';
+import { siApplemusic, siBandcamp, siInstagram, siSpotify, siTiktok, siYoutube } from 'simple-icons';
+import { site, type LinkIcon } from '../data/site';
+import type { Dictionary } from '../i18n';
 import SectionHeading from './SectionHeading.astro';
+import TornEdge from './deco/TornEdge.astro';
+import Doodle from './deco/Doodle.astro';
+
+interface Props {
+  t: Dictionary;
+}
+const { t } = Astro.props;
+
+// Brand icons (24×24 SVG paths). Add more from https://simpleicons.org as needed.
+const icons: Record<LinkIcon, { path: string }> = {
+  instagram: siInstagram,
+  youtube: siYoutube,
+  spotify: siSpotify,
+  applemusic: siApplemusic,
+  bandcamp: siBandcamp,
+  tiktok: siTiktok,
+};
 ---
 
-<section id="links" class="mx-auto max-w-6xl scroll-mt-20 px-5 py-24 sm:px-8">
-  <SectionHeading eyebrow="03 / Links" title="Find us everywhere" />
-  <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-    {site.links.map((link) => (
-      <li>
-        <a
-          href={link.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="group flex items-center justify-between rounded-2xl border border-line bg-ink-2 px-6 py-5 transition hover:border-accent hover:bg-accent hover:text-ink"
-        >
-          <span>
-            <span class="block font-display text-2xl tracking-wide uppercase">{link.label}</span>
-            <span class="block text-sm text-muted transition group-hover:text-ink/70">{link.handle}</span>
-          </span>
-          <svg
-            class="h-6 w-6 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            aria-hidden="true"
-          >
-            <path d="M7 17 17 7M8 7h9v9" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </a>
-      </li>
-    ))}
-  </ul>
+<!-- Styled like a hand-lettered menu: big marker words, highlighter swipe on hover. -->
+<section id="links" class="relative scroll-mt-16 bg-paper-2">
+  <TornEdge position="above" fill="var(--color-paper-2)" seed={5} />
+  <div class="relative mx-auto max-w-6xl px-5 py-24 sm:px-8">
+    <Doodle name="swirl" class="absolute top-24 right-8 hidden h-16 w-16 text-ink/70 sm:block" />
+    <SectionHeading eyebrow={t.links.eyebrow} title={t.links.title} />
+    <ul class="grid gap-x-12 gap-y-4 sm:grid-cols-2">
+      {site.links.map((link, i) => (
+        <li class={i % 2 ? 'sm:translate-x-4' : ''}>
+          <a href={link.href} target="_blank" rel="noopener noreferrer" class="group flex items-center gap-4 py-2">
+            <svg
+              class="h-9 w-9 shrink-0 transition-transform group-hover:-rotate-12"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d={icons[link.icon].path} />
+            </svg>
+            <span class="min-w-0">
+              <span class="hl-hover block w-fit font-marker text-3xl leading-tight uppercase sm:text-4xl">
+                {link.label}
+              </span>
+              <span class="block truncate font-hand text-xl text-ink-soft">
+                {link.handle ?? t.links.platformCta[link.icon]}
+              </span>
+            </span>
+            <Doodle
+              name="arrow"
+              class="ml-auto h-8 w-14 shrink-0 text-accent opacity-0 transition group-hover:translate-x-1 group-hover:opacity-100"
+            />
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
 </section>

@@ -1,20 +1,29 @@
 ---
 import { site } from '../data/site';
+import type { Dictionary } from '../i18n';
 import SectionHeading from './SectionHeading.astro';
 import ContactForm from './ContactForm';
+import Doodle from './deco/Doodle.astro';
+
+interface Props {
+  t: Dictionary;
+}
+const { t } = Astro.props;
 ---
 
-<section id="contact" class="scroll-mt-20 border-t border-line bg-ink-2">
-  <div class="mx-auto grid max-w-6xl gap-12 px-5 py-24 sm:px-8 md:grid-cols-[1fr_1.4fr]">
-    <div>
-      <SectionHeading eyebrow="04 / Contact" title="Get in touch" />
-      <p class="text-lg leading-relaxed text-bone/80">
-        Booking, press, or just want to say hi? Drop us a line and we’ll get back to you.
-      </p>
-      <a href={`mailto:${site.email}`} class="mt-6 inline-block text-lg font-semibold text-accent hover:underline">
+<section id="contact" class="notebook scroll-mt-16 pb-16">
+  <div class="mx-auto grid max-w-6xl gap-12 px-5 py-24 sm:px-8 md:grid-cols-[1fr_1.4fr] md:pl-24">
+    <div class="relative min-w-0">
+      <SectionHeading eyebrow={t.contact.eyebrow} title={t.contact.title} />
+      <p class="text-lg leading-relaxed text-ink-soft">{t.contact.intro}</p>
+      <a
+        href={`mailto:${site.email}`}
+        class="mt-6 inline-block font-hand text-2xl break-all text-accent underline decoration-wavy decoration-2 underline-offset-4 sm:text-3xl"
+      >
         {site.email}
       </a>
+      <Doodle name="x" class="mt-10 hidden h-10 w-10 text-ink/60 md:block" />
     </div>
-    <ContactForm client:visible fallbackEmail={site.email} />
+    <ContactForm client:visible fallbackEmail={site.email} t={t.contact.form} />
   </div>
 </section>

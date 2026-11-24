@@ -1,12 +1,25 @@
 ---
+import Scribble from './deco/Scribble.astro';
+
 interface Props {
   eyebrow: string;
   title: string;
+  /** Use on dark backgrounds */
+  dark?: boolean;
 }
-const { eyebrow, title } = Astro.props;
+const { eyebrow, title, dark = false } = Astro.props;
 ---
 
-<div class="mb-10">
-  <p class="mb-3 text-xs font-semibold tracking-[0.3em] text-accent uppercase">{eyebrow}</p>
-  <h2 class="font-display text-5xl leading-none uppercase sm:text-6xl">{title}</h2>
+<div class="mb-12">
+  <!-- Red marker label, like a sticker slapped on the page -->
+  <p
+    class="sketch mb-5 block w-fit -rotate-3 px-4 py-1 font-marker text-lg tracking-wide text-bone uppercase"
+    style="--sketch-fill: var(--color-accent); --sketch-color: var(--color-accent);"
+  >
+    {eyebrow}
+  </p>
+  <h2 class:list={['inline-block font-marker text-5xl leading-none uppercase sm:text-7xl', dark ? 'text-bone' : 'text-ink']}>
+    {title}
+    <Scribble class="mt-2" />
+  </h2>
 </div>

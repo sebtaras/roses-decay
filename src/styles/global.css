@@ -1,39 +1,150 @@
 @import "tailwindcss";
 
+/* Zine / sketchbook theme: notebook paper, marker ink, highlighter, the logo's red. */
 @theme {
-  --color-ink: #0b0b0c;
-  --color-ink-2: #141416;
-  --color-line: #26262a;
-  --color-bone: #f2efe9;
-  --color-muted: #9a978f;
-  --color-accent: #ff4d2e;
+  --color-paper: #f4f0e6;
+  --color-paper-2: #ebe5d7;
+  --color-ink: #121212;
+  --color-ink-soft: #3b3a37;
+  --color-rule: #9db7d9; /* blue notebook lines */
+  --color-accent: #d4161b; /* logo rose red */
+  --color-hl: #ffe14d; /* highlighter yellow */
+  --color-bone: #f4f0e6; /* light text on always-dark areas */
+  --color-night: #121212; /* always-dark areas: hero, footer, ink drips, player frames */
+  --color-card: #ffffff; /* polaroid paper */
 
-  --font-display: "Anton", "Impact", sans-serif;
+  --font-marker: "Permanent Marker", "Comic Sans MS", cursive;
+  --font-hand: "Caveat", "Comic Sans MS", cursive;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Dark theme: same zine, but on a dark sketchbook page with chalky ink. Set via <html data-theme="dark">. */
+[data-theme="dark"] {
+  --color-paper: #1b1a17;
+  --color-paper-2: #24221e;
+  --color-ink: #ece6d8;
+  --color-ink-soft: #b9b2a3;
+  --color-rule: #4f6688;
+  --color-accent: #e0272c;
+  --color-card: #e9e4d8;
+  color-scheme: dark;
 }
 
 html {
   scroll-behavior: smooth;
-  background: var(--color-ink);
-  color: var(--color-bone);
+  background: var(--color-paper);
+  color: var(--color-ink);
 }
 
 body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  /* faint paper grain */
+  background-color: var(--color-paper);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3  0 0 0 0 0.25  0 0 0 0 0.2  0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 ::selection {
-  background: var(--color-accent);
-  color: var(--color-ink);
+  background: var(--color-hl);
+  color: var(--color-night);
 }
 
-/* Film-grain overlay on the hero */
+/* Nav logo: white over the hero, black on the light paper strip, white on the dark paper strip. */
+.nav-logo-dark { display: none; }
+[data-nav][data-scrolled] .nav-logo-light { display: none; }
+[data-nav][data-scrolled] .nav-logo-dark { display: block; }
+[data-theme="dark"] [data-nav][data-scrolled] .nav-logo-light { display: block; }
+[data-theme="dark"] [data-nav][data-scrolled] .nav-logo-dark { display: none; }
+
+/* Theme toggle icon: show the moon in light mode (go dark), the sun in dark mode. */
+[data-theme="dark"] .icon-moon,
+:root:not([data-theme="dark"]) .icon-sun { display: none; }
+
+/* Ruled notebook paper; the red margin line only shows on wider screens where there's room for it. */
+.notebook {
+  position: relative;
+  background-image: repeating-linear-gradient(transparent 0 31px, color-mix(in srgb, var(--color-rule) 45%, transparent) 31px 32px);
+}
+@media (min-width: 768px) {
+  .notebook {
+    background-image:
+      linear-gradient(90deg, transparent 0 calc(4.5rem - 1px), color-mix(in srgb, var(--color-accent) 55%, transparent) calc(4.5rem - 1px) calc(4.5rem + 1px), transparent calc(4.5rem + 1px)),
+      repeating-linear-gradient(transparent 0 31px, color-mix(in srgb, var(--color-rule) 45%, transparent) 31px 32px);
+  }
+}
+
+/* Hand-drawn box: wobbly border-radius + displacement filter on a pseudo-element, so content stays crisp. */
+.sketch {
+  position: relative;
+  isolation: isolate;
+}
+.sketch::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border: 2.5px solid var(--sketch-color, var(--color-ink));
+  border-radius: 255px 18px 225px 18px / 18px 225px 18px 255px;
+  background: var(--sketch-fill, transparent);
+  filter: url(#rough);
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+/* Highlighter swipe behind text. */
+.hl {
+  background: linear-gradient(100deg, transparent 2%, var(--color-hl) 4%, var(--color-hl) 94%, transparent 97%) no-repeat;
+  background-size: 100% 70%;
+  background-position: 0 70%;
+  padding: 0 0.3em;
+  color: var(--color-night);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Highlighter that swipes in on hover (put on an element inside a .group link). */
+.hl-hover {
+  background: linear-gradient(100deg, transparent 2%, var(--color-hl) 4%, var(--color-hl) 94%, transparent 97%) no-repeat;
+  background-size: 0% 70%;
+  background-position: 0 70%;
+  padding: 0 0.2em;
+  transition: background-size 0.25s ease-out;
+}
+.group:hover .hl-hover,
+.group:focus-visible .hl-hover {
+  background-size: 100% 70%;
+  color: var(--color-night);
+}
+
+/* Piece of masking tape for photos. */
+.tape {
+  position: absolute;
+  width: 6.5rem;
+  height: 1.8rem;
+  background: rgb(255 248 220 / 0.75);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.15);
+  clip-path: polygon(3% 0, 97% 4%, 100% 50%, 96% 100%, 2% 96%, 0 45%);
+}
+
+/* Film grain on the dark hero */
 .grain::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.12;
+  opacity: 0.14;
+  /* fade grain out at the bottom so the hero blends seamlessly into the ink drips */
+  -webkit-mask-image: linear-gradient(to top, transparent, #000 25%);
+  mask-image: linear-gradient(to top, transparent, #000 25%);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+.hover-wiggle:hover { animation: wiggle 0.3s ease-in-out 2; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hover-wiggle:hover { animation: none; }
 }

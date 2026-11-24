@@ -1,34 +1,113 @@
 ---
+import { Image } from 'astro:assets';
 import { site } from '../data/site';
+import { languages, type Lang, type Dictionary } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  t: Dictionary;
+}
+const { lang, t } = Astro.props;
+
+// `show` = from which breakpoint the item appears (phones only get Contact to leave room for HR/EN + theme)
 const items = [
-  { href: '#listen', label: 'Listen' },
-  { href: '#about', label: 'About' },
-  { href: '#links', label: 'Links' },
-  { href: '#contact', label: 'Contact' },
+  { href: '#listen', label: t.nav.listen, show: 'hidden sm:block' },
+  { href: '#about', label: t.nav.about, show: 'hidden md:block' },
+  { href: '#links', label: t.nav.links, show: 'hidden sm:block' },
+  { href: '#contact', label: t.nav.contact, show: '' },
 ];
 ---
 
-<header class="fixed inset-x-0 top-0 z-50 border-b border-transparent transition-colors duration-300" data-nav>
-  <nav class="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
-    <a href="#top" class="font-display text-xl tracking-wide uppercase">{site.name}</a>
-    <ul class="flex gap-5 text-sm font-medium text-bone/80 sm:gap-8">
-      {items.map((i) => (
-        <li class={i.href === '#about' ? 'hidden sm:block' : ''}>
-          <a href={i.href} class="transition-colors hover:text-accent">{i.label}</a>
-        </li>
-      ))}
-    </ul>
+<!-- Transparent with light text over the hero; turns into a paper strip with ink text once scrolled. -->
+<header
+  class="fixed inset-x-0 top-0 z-50 text-bone transition-colors duration-300 data-[scrolled]:bg-paper/95 data-[scrolled]:text-ink data-[scrolled]:shadow-[0_2px_0_var(--color-ink)] data-[scrolled]:backdrop-blur"
+  data-nav
+>
+  <nav class="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-8">
+    <a href="#top" class="flex shrink-0 items-center gap-3" aria-label={t.nav.home}>
+      <Image src={site.logo} alt="" width={96} class="nav-logo-light h-10 w-auto sm:h-11" loading="eager" />
+      <Image src={site.logoDark} alt="" width={96} class="nav-logo-dark h-10 w-auto sm:h-11" loading="eager" />
+      <span class="hidden font-marker text-xl uppercase lg:inline">{site.name}</span>
+    </a>
+
+    <div class="flex items-center gap-3 sm:gap-6">
+      <ul class="flex gap-3 font-marker text-sm uppercase sm:gap-6 sm:text-lg">
+        {items.map((i) => (
+          <li class={i.show}>
+            <a href={i.href} class="hover-wiggle inline-block transition-colors hover:text-accent">{i.label}</a>
+          </li>
+        ))}
+      </ul>
+
+      <div class="flex items-center gap-1 border-l-2 border-current/40 pl-3 sm:gap-2 sm:pl-5">
+        <!-- Language switcher -->
+        <ul class="flex font-marker text-sm sm:text-base" aria-label={t.nav.language}>
+          {Object.entries(languages).map(([code, l]) => (
+            <li>
+              {code === lang ? (
+                <span class="hl block px-1" aria-current="true" lang={code} title={l.name}>{l.label}</span>
+              ) : (
+                <a href={l.path} class="block px-1 opacity-70 hover:text-accent hover:opacity-100" lang={code} hreflang={code} title={l.name} data-lang-switch={code}>
+                  {l.label}
+                </a>
+              )}
+            </li>
+          ))}
+        </ul>
+
+        <!-- Theme toggle -->
+        <button
+          type="button"
+          class="hover-wiggle ml-1 grid h-9 w-9 place-items-center rounded-full transition-colors hover:text-accent"
+          data-theme-toggle
+          data-label-dark={t.nav.themeToDark}
+          data-label-light={t.nav.themeToLight}
+          aria-label={t.nav.themeToDark}
+        >
+          <svg class="icon-moon h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" />
+          </svg>
+          <svg class="icon-sun h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4.2" />
+            <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" />
+          </svg>
+        </button>
+      </div>
+    </div>
   </nav>
 </header>
 
 <script>
-  const nav = document.querySelector('[data-nav]');
-  const onScroll = () => {
-    const scrolled = window.scrollY > 40;
-    nav?.classList.toggle('bg-ink/85', scrolled);
-    nav?.classList.toggle('backdrop-blur', scrolled);
-    nav?.classList.toggle('border-line', scrolled);
-  };
+  // Nav background once past the hero
+  const nav = document.querySelector<HTMLElement>('[data-nav]');
+  const onScroll = () => nav?.toggleAttribute('data-scrolled', window.scrollY > window.innerHeight * 0.6);
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
+
+  // Remember the language someone picks, so the home page doesn't auto-redirect them again
+  document.querySelectorAll<HTMLAnchorElement>('[data-lang-switch]').forEach((a) => {
+    a.addEventListener('click', () => {
+      try {
+        localStorage.setItem('lang', a.dataset.langSwitch!);
+      } catch {}
+      a.href += location.hash; // stay on the same section
+    });
+  });
+
+  // Theme toggle (initial theme is applied by an inline script in Layout.astro before paint)
+  const toggle = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+  const syncLabel = () => {
+    const dark = document.documentElement.dataset.theme === 'dark';
+    toggle?.setAttribute('aria-label', (dark ? toggle.dataset.labelLight : toggle.dataset.labelDark) ?? '');
+    toggle?.setAttribute('aria-pressed', String(dark));
+  };
+  toggle?.addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem('theme', next);
+    } catch {}
+    syncLabel();
+  });
+  syncLabel();
 </script>

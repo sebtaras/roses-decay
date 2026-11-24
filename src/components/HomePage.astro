@@ -1,0 +1,30 @@
+---
+// The whole one-page site, rendered once per language (src/pages/index.astro and src/pages/en/index.astro).
+import Layout from '../layouts/Layout.astro';
+import Nav from './Nav.astro';
+import Hero from './Hero.astro';
+import Listen from './Listen.astro';
+import About from './About.astro';
+import Links from './Links.astro';
+import Contact from './Contact.astro';
+import Footer from './Footer.astro';
+import { getDictionary, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = getDictionary(lang);
+---
+
+<Layout lang={lang}>
+  <Nav lang={lang} t={t} />
+  <main>
+    <Hero t={t} />
+    <Listen t={t} />
+    <About t={t} />
+    <Links t={t} />
+    <Contact t={t} />
+  </main>
+  <Footer t={t} />
+</Layout>

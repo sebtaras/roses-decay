@@ -1,11 +1,24 @@
 ---
+import { Image } from 'astro:assets';
 import { site } from '../data/site';
+import type { Dictionary } from '../i18n';
+import TornEdge from './deco/TornEdge.astro';
+
+interface Props {
+  t: Dictionary;
+}
+const { t } = Astro.props;
 const year = new Date().getFullYear();
 ---
 
-<footer class="border-t border-line">
-  <div class="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-10 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-8">
-    <p>© {year} {site.name}. All rights reserved.</p>
-    <a href="#top" class="hover:text-bone">Back to top ↑</a>
+<footer class="relative bg-night text-bone">
+  <TornEdge position="above" fill="var(--color-night)" seed={9} />
+  <div class="mx-auto flex max-w-6xl flex-col items-center gap-6 px-5 pt-14 pb-10 text-center sm:px-8">
+    <Image src={site.logo} alt={site.name} width={240} class="h-28 w-auto -rotate-3" />
+    <p class="font-hand text-2xl text-bone/80">{t.footer.thanks}</p>
+    <div class="flex flex-col items-center gap-3 text-sm text-bone/60 sm:flex-row sm:gap-8">
+      <p>© {year} {site.name}. {t.footer.rights}</p>
+      <a href="#top" class="font-marker text-base text-bone uppercase hover:text-hl">{t.footer.backToTop}</a>
+    </div>
   </div>
 </footer>

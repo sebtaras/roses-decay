@@ -1,22 +1,44 @@
 ---
+import { Image } from 'astro:assets';
 import { site } from '../data/site';
+import type { Dictionary } from '../i18n';
 import SectionHeading from './SectionHeading.astro';
+import TornEdge from './deco/TornEdge.astro';
+import Doodle from './deco/Doodle.astro';
+
+interface Props {
+  t: Dictionary;
+}
+const { t } = Astro.props;
 ---
 
-<section id="about" class="scroll-mt-20 border-y border-line bg-ink-2">
-  <div class="mx-auto grid max-w-6xl items-center gap-12 px-5 py-24 sm:px-8 md:grid-cols-2">
-    <img
-      src={site.images.about}
-      alt={`${site.name} band photo`}
-      class="aspect-[4/5] w-full rounded-2xl object-cover"
-      loading="lazy"
-    />
+<section id="about" class="relative scroll-mt-16 bg-paper-2">
+  <TornEdge position="above" fill="var(--color-paper-2)" seed={2} />
+  <div class="mx-auto grid max-w-6xl items-center gap-14 px-5 py-24 sm:px-8 md:grid-cols-2">
+    <!-- Taped-in polaroid -->
+    <figure class="relative mx-auto w-full max-w-md rotate-2 bg-card p-3 pb-14 shadow-[4px_6px_0_rgb(0_0_0/0.85)]">
+      <span class="tape -top-4 left-1/2 -translate-x-1/2 -rotate-3" aria-hidden="true"></span>
+      <Image
+        src={site.images.about}
+        alt={t.about.photoAlt}
+        widths={[480, 800, 1200]}
+        sizes="(min-width: 768px) 440px, 100vw"
+        class="aspect-[4/5] w-full object-cover"
+      />
+      <figcaption class="absolute inset-x-0 bottom-3 text-center font-hand text-3xl text-night">
+        {t.about.photoCaption}
+      </figcaption>
+      <Doodle name="heart" class="absolute -right-6 -bottom-6 h-14 w-14 -rotate-12 text-accent" />
+    </figure>
+
     <div>
-      <SectionHeading eyebrow="02 / About" title="Who we are" />
-      <div class="space-y-5 text-lg leading-relaxed text-bone/80">
-        {site.about.map((p) => <p>{p}</p>)}
+      <SectionHeading eyebrow={t.about.eyebrow} title={t.about.title} />
+      <div class="space-y-5 text-lg leading-relaxed text-ink-soft">
+        {t.about.paragraphs.map((p, i) => <p class={i === 0 ? 'text-xl text-ink' : ''}>{p}</p>)}
       </div>
-      <p class="mt-8 text-sm tracking-widest text-muted uppercase">Based in {site.location}</p>
+      <p class="mt-8 font-marker text-lg uppercase">
+        {t.about.basedIn} <span class="hl">{t.about.location}</span>
+      </p>
     </div>
   </div>
 </section>

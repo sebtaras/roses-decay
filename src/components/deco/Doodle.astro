@@ -1,0 +1,47 @@
+---
+// Small marker doodles to scatter around. Pass `name` and position with classes.
+interface Props {
+  name: 'star' | 'arrow' | 'swirl' | 'x' | 'heart';
+  class?: string;
+  color?: string;
+}
+const { name, class: className = '', color = 'currentColor' } = Astro.props;
+
+const paths: Record<Props['name'], { viewBox: string; d: string[] }> = {
+  star: {
+    viewBox: '0 0 48 48',
+    d: ['M24 4 L28 18 L43 18 L31 27 L36 42 L24 33 L12 42 L17 27 L5 18 L20 18 Z'],
+  },
+  arrow: {
+    viewBox: '0 0 120 60',
+    d: ['M6 50 C 30 10, 70 5, 104 22', 'M90 10 L106 23 L88 32'],
+  },
+  swirl: {
+    viewBox: '0 0 60 60',
+    d: ['M30 30 m-3 0 a3 3 0 1 1 6 0 a8 8 0 1 1 -14 -4 a14 14 0 1 1 26 8 a20 20 0 1 1 -36 -8'],
+  },
+  x: {
+    viewBox: '0 0 40 40',
+    d: ['M8 8 L32 32', 'M32 7 L9 33'],
+  },
+  heart: {
+    viewBox: '0 0 48 44',
+    d: ['M24 40 C 6 28, 2 16, 10 9 C 16 4, 22 7, 24 13 C 26 7, 33 3, 39 8 C 47 15, 42 28, 24 40 Z'],
+  },
+};
+const p = paths[name];
+---
+
+<svg
+  class:list={['pointer-events-none', className]}
+  viewBox={p.viewBox}
+  fill="none"
+  stroke={color}
+  stroke-width="3"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  style="filter: url(#rough)"
+  aria-hidden="true"
+>
+  {p.d.map((d) => <path d={d} />)}
+</svg>

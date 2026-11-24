@@ -1,19 +1,57 @@
 ---
 import { site } from '../data/site';
+import type { Dictionary } from '../i18n';
 import SectionHeading from './SectionHeading.astro';
+import Doodle from './deco/Doodle.astro';
+import InkDrips from './deco/InkDrips.astro';
+
+interface Props {
+  t: Dictionary;
+}
+const { t } = Astro.props;
 ---
 
-<section id="listen" class="mx-auto max-w-6xl scroll-mt-20 px-5 py-24 sm:px-8">
-  <SectionHeading eyebrow="01 / Listen" title="Hear it loud" />
-  <div class="overflow-hidden rounded-2xl border border-line bg-ink-2">
-    <iframe
-      title={`${site.name} on Spotify`}
-      src={site.spotifyEmbed}
-      width="100%"
-      height="452"
-      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-      loading="lazy"
-      class="block"
-    ></iframe>
+<section id="listen" class="notebook scroll-mt-16">
+  <InkDrips seed={4} />
+  <div class="relative mx-auto max-w-6xl px-5 py-24 sm:px-8 md:pl-24">
+    <Doodle name="star" class="absolute top-20 right-6 h-12 w-12 rotate-12 text-accent sm:right-16" />
+    <SectionHeading eyebrow={t.listen.eyebrow} title={t.listen.title} />
+
+    <div class="grid gap-10 lg:grid-cols-2">
+      <div class="relative rotate-[-0.6deg]">
+        <span class="tape -top-3 left-8 z-10 -rotate-6" aria-hidden="true"></span>
+        <div class="sketch overflow-hidden p-2" style="--sketch-fill: var(--color-night);">
+          <iframe
+            title={t.listen.spotifyTitle}
+            src={site.spotifyEmbed}
+            width="100%"
+            height="452"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"
+            class="block rounded-xl"
+          ></iframe>
+        </div>
+      </div>
+
+      {site.youtubeId && (
+        <div class="relative rotate-[0.8deg] self-center">
+          <span class="tape -top-3 right-8 z-10 rotate-6" aria-hidden="true"></span>
+          <div class="sketch p-2" style="--sketch-fill: var(--color-night);">
+            <div class="aspect-video overflow-hidden rounded-xl">
+              <iframe
+                title={t.listen.youtubeTitle}
+                src={`https://www.youtube-nocookie.com/embed/${site.youtubeId}`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+                loading="lazy"
+                class="block h-full w-full"
+              ></iframe>
+            </div>
+          </div>
+          <p class="mt-4 text-right font-hand text-2xl text-ink-soft">{t.listen.watchNote}</p>
+        </div>
+      )}
+    </div>
   </div>
 </section>

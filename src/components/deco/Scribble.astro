@@ -1,0 +1,26 @@
+---
+// Hand-drawn marker underline (two passes, like a quick double stroke).
+interface Props {
+  color?: string;
+  class?: string;
+}
+const { color = 'var(--color-accent)', class: className = '' } = Astro.props;
+---
+
+<svg class:list={['block h-4 w-full', className]} viewBox="0 0 240 16" preserveAspectRatio="none" aria-hidden="true">
+  <path
+    d="M3 9 C 40 3, 85 13, 125 7 S 200 4, 237 8"
+    fill="none"
+    stroke={color}
+    stroke-width="4"
+    stroke-linecap="round"
+  />
+  <path
+    d="M10 12 C 55 8, 110 15, 160 10 S 215 9, 232 11"
+    fill="none"
+    stroke={color}
+    stroke-width="2.5"
+    stroke-linecap="round"
+    opacity="0.8"
+  />
+</svg>

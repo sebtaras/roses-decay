@@ -1,0 +1,34 @@
+---
+// Ink dripping down from a dark section above. Place at the top of the section below it
+// (that section needs `relative`). Shape is seeded so it's stable between builds.
+interface Props {
+  fill?: string;
+  seed?: number;
+}
+const { fill = 'var(--color-night)', seed = 3 } = Astro.props;
+
+let s = seed * 7919 + 104729;
+const rand = () => ((s = (s * 9301 + 49297) % 233280) / 233280);
+
+const drips: { x: number; w: number; len: number }[] = [];
+let x = 10 + rand() * 40;
+while (x < 1180) {
+  drips.push({ x, w: 5 + rand() * 12, len: 20 + rand() * 54 });
+  x += 35 + rand() * 110;
+}
+---
+
+<svg
+  class="pointer-events-none absolute inset-x-0 top-0 z-10 h-12 w-full -translate-y-2 sm:h-20"
+  viewBox="0 0 1200 80"
+  preserveAspectRatio="none"
+  aria-hidden="true"
+>
+  <rect x="0" y="0" width="1200" height="18" fill={fill} />
+  {drips.map((d) => (
+    <g fill={fill}>
+      <rect x={d.x} y="0" width={d.w} height={d.len} />
+      <ellipse cx={d.x + d.w / 2} cy={d.len} rx={d.w * 0.7} ry={d.w * 0.85} />
+    </g>
+  ))}
+</svg>

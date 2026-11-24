@@ -1,0 +1,39 @@
+---
+// Torn-paper edge. Sits at the top or bottom of a section and fills with the color of the
+// section it leads into. Shape is generated with a seeded random so it's stable between builds.
+interface Props {
+  fill?: string;
+  /** bottom: inside the section's bottom edge. above: sticks up out of the section's top edge. */
+  position?: 'bottom' | 'above';
+  seed?: number;
+  class?: string;
+}
+const { fill = 'var(--color-paper)', position = 'bottom', seed = 1, class: className = '' } = Astro.props;
+
+let s = seed * 9301 + 49297;
+const rand = () => ((s = (s * 9301 + 49297) % 233280) / 233280);
+
+const W = 1200;
+const H = 40;
+let x = 0;
+const pts: string[] = [];
+while (x < W) {
+  pts.push(`${x.toFixed(1)},${(8 + rand() * 22).toFixed(1)}`);
+  x += 8 + rand() * 26;
+}
+pts.push(`${W},${(8 + rand() * 22).toFixed(1)}`);
+const d = `M0,${H} L${pts.join(' L')} L${W},${H} Z`;
+---
+
+<svg
+  class:list={[
+    'pointer-events-none absolute inset-x-0 z-10 h-6 w-full sm:h-10',
+    position === 'bottom' ? '-bottom-px' : 'bottom-full translate-y-px',
+    className,
+  ]}
+  viewBox={`0 0 ${W} ${H}`}
+  preserveAspectRatio="none"
+  aria-hidden="true"
+>
+  <path d={d} fill={fill} />
+</svg>
